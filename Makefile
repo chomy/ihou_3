@@ -9,8 +9,8 @@ DVI=${PREFIX}.dvi
 PDF=${PREFIX}.pdf
 PS=${PREFIX}.ps
 BOOK=${PREFIX}-print.pdf
-TEXFILES=ihou.tex iq.tex editor.tex colophon.tex cover.tex
-PSFILES=am.ps carr.ps sig.ps i.ps q.ps demodulate.ps out.ps
+TEXFILES=ihou.tex fm.tex colophon.tex cover.tex
+#PSFILES=am.ps carr.ps sig.ps i.ps q.ps demodulate.ps out.ps
 
 .suffix: .tex .dvi
 
