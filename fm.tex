@@ -6,6 +6,7 @@ DSP AM/FMラジオキットに使われているIC SI4825-A10 のデータシー
 もちろん今回も冗長なのは百も承知で、数式の展開の過程はできるだけ省かないこととする。
 
 \section*{FM変調}
+まずFM変調波がどのような数式で書けるか考えよう。
 周波数$f$の電波がアンテナに受信された時、その出力電圧を$V$とすると、
 \begin{equation}
 V = A\sin(2 \pi f t + \phi) = A\sin(\omega t + \phi)
@@ -23,8 +24,67 @@ V_c = C\sin(2 \pi f_c t) = C\sin\omega_c t \label{eq:FM_car}
 V_s = S\sin(2 \pi f_s t) = S\sin\omega_s t \label{eq:FM_sig}
 \end{equation}
 
-$V_s$に応じて、$V_c$の周波数を変化させるのがFM変調であるから、式\ref{eq:FM_car}は
+$V_s$に応じて、$V_c$の周波数を変化させるのがFM変調であるので、変調波$V_{fm}$は
+$\theta_m$を時刻$t$の関数とすると、
 \begin{equation}
-V_m = C\sin(\omega_c t + m\sin\omega_st)
+V_{fm} = C\sin\theta_m \label{eq:FM_mod}
 \end{equation}
-ここで、$m$は、変調指数である。変調指数$m$は、
+である。
+
+信号入力電圧1Vあたりの周波数の変化量は、
+マイク等から入力された音声信号の電圧の最大値を$S$、
+その時の角周波数の変化量を$\Delta\omega$とすると、
+\[\delta\omega = \frac{\Delta\omega}{S}\]
+となる。$\theta_m$は
+\begin{eqnarray}
+\theta_m &=& \omega_ct + \delta\omega\int_{0}^{t}S\sin\omega_st dt \nonumber\\
+&=& \omega_c t + \frac{\Delta\omega}{S} \int_{0}^{t}S\sin\omega_st dt \nonumber\\
+&=& \omega_c t + \frac{\Delta\omega}{S}[\frac{S}{\omega_s}\cos\omega_st]_{0}^{t} \nonumber\\
+&=& \omega_c t + \frac{\Delta\omega}{\omega_s}\cos\omega_st \nonumber\\
+&=& \omega_c t + m\cos\omega_s t
+\end{eqnarray}
+となる。ここで$m$は変調指数と呼ばれる定数で、
+\begin{equation}
+m = \frac{\Delta\omega}{\omega_s} = \frac{\Delta f}{f_s} \label{eq:mod_factor}
+\end{equation}
+である。$\Delta f$は最大周波数偏位で、FM放送では75kHzと決められている。
+
+最後に、式\ref{eq:mod_factor}を、式\ref{eq:FM_mod}に代入することで
+FM変調波の一般式が求められる。
+\begin{equation}
+  V_m = C\sin(\omega_c t + m\cos\omega_st) \label{eq:FM}
+\end{equation}
+
+\section*{FM復調}
+次は、式\ref{eq:FM}で変調された信号をIQ検波してみよう。
+IQ検波については、前号を参照してほしい。
+
+局部発信機(Local Oscillator)の周波数を$f_L$、角周波数$\omega_L = 2\pi f_L$とする。
+I成分およびQ成分は、
+\begin{eqnarray*}
+I &=& C\sin(\omega_ct + m\cos\omega_st)\sin\omega_Lt\\
+Q &=& C\sin(\omega_ct + m\cos\omega_st)\sin(\omega_Lt + \frac{\pi}{2}) \nonumber\\
+&=& C\sin(\omega_ct + m\cos\omega_st)\cos(\omega_Lt)
+\end{eqnarray*}
+三角関数の公式
+\begin{eqnarray}
+\sin x \sin y &=& \frac{1}{2}{\cos(x-y) - \cos(x+y)} \nonumber\\
+\sin x \cos y &=& \frac{1}{2}{\sin(x+y) + \sin(x-y)} \nonumber
+\end{eqnarray}
+に注意して、局部発振周波数と搬送波周波数を一致させる。すなわち$\omega_L = \omega_c$
+とすると、
+\begin{eqnarray}
+I &=& \frac{C}{2}\{\cos(m\sin\omega_st) - \cos(2\omega_ct + m\sin\omega_st)\}\nonumber\\
+Q &=& \frac{C}{2}\{\sin(m\sin\omega_st) + \sin(2\omega_ct + m\sin\omega_st)\}\nonumber
+\end{eqnarray}
+となり、LPF(Low Pass Filter)で、搬送波の成分を除去すると、
+\begin{eqnarray}
+I' &=& \frac{C}{2}\cos(m\sin\omega_st)\nonumber\\
+Q' &=& \frac{C}{2}\sin(m\sin\omega_st)\nonumber
+\end{eqnarray}
+となる。よって
+\begin{eqnarray*}
+  \frac{Q'}{I'} &=& \frac{\sin(m\sin\omega_st)}{\cos(m\sin\omega_st)} = \tan(m\sin\omega_st)\\
+  \therefore \sin\omega_st &=& \frac{1}{m}\tan^{-1}\frac{Q'}{I'}
+\end{eqnarray*}
+となり、信号波を搬送波から分離することができた。これが、FM変調波のIQ復調の原理である。
