@@ -2,6 +2,7 @@ TEX=platex
 DVIPDF=dvipdfmx
 DVIPDFFLAGS=-pa4
 DVIPS=dvips
+PDF2PS=pdf2ps
 PAPERSIZE=a5
 
 PREFIX=ihou
@@ -30,11 +31,12 @@ ${DVI}: ${TEXFILES} ${PSFILES}
 ${PDF}: ${DVI} 
 	${DVIPDF} -p a5 ${DVI}
 
-${PS}: ${DVI} 
-	${DVIPS} -t a5 ${DVI}
+${PS}: ${PDF} 
+#	${DVIPS} -t a5 ${DVI}
+	${PDF2PS} ${PDF}
 
 ${BOOK}: ${PS}
-	psbook ${PS} | psnup -2 -p ${PAPERSIZE}| psresize -Pa5 -pa4 | ps2pdf - ${BOOK}
+	psbook ${PS} | psnup -2 -P ${PAPERSIZE}| ps2ps -sPAPERSIZE=a4 - - | ps2pdf - ${BOOK}
 #	psbook ${PS} | psnup -2 | psresize -p A3 | ps2ps -sPAPERSIZE=a3 - - | ps2pdf - ${BOOK}
 
 
